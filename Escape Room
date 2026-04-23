@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Escape Room 3D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin:0; overflow:hidden; font-family:Arial; }
+
+    /* MENU */
+    #menu {
+      position:absolute;
+      width:100%;
+      height:100%;
+      background:#111;
+      color:white;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      z-index:10;
+    }
+
+    #menu button {
+      padding:15px 25px;
+      margin:10px;
+      font-size:18px;
+      cursor:pointer;
+    }
+
+    /* MOBILE UI */
+    #mobileControls {
+      position:absolute;
+      width:100%;
+      height:100%;
+      display:none;
+      z-index:5;
+    }
+
+    #pad {
+      position:absolute;
+      bottom:20px;
+      left:20px;
+    }
+
+    #pad button {
+      width:60px;
+      height:60px;
+      margin:5px;
+      font-size:20px;
+    }
+
+    /* INFO */
+    #info {
+      position:absolute;
+      top:10px;
+      left:10px;
+      color:white;
+      background:rgba(0,0,0,0.5);
+      padding:10px;
+      display:none;
+      z-index:6;
+    }
+  </style>
+</head>
+<body>
+
+<!-- MENU -->
+<div id="menu">
+  <h1>🚪 Escape Room 3D</h1>
+  <button onclick="startGame('pc')">💻 PC Mode</button>
+  <button onclick="startGame('mobile')">📱 Mobile Mode</button>
+</div>
+
+<!-- INFO -->
+<div id="info">WASD ilə hərəkət et</div>
+
+<!-- MOBILE CONTROLS -->
+<div id="mobileControls">
+  <div id="pad">
+    <button onclick="move('w')">⬆</button><br>
+    <button onclick="move('a')">⬅</button>
+    <button onclick="move('s')">⬇</button>
+    <button onclick="move('d')">➡</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+
+<script>
+
+let mode = "pc";
+
+// SCENE
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111);
+
+// CAMERA (POV)
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth/window.innerHeight,
+  0.1,
+  1000
+);
+
+// RENDERER
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// FLOOR
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(10,10),
+  new THREE.MeshBasicMaterial({color:0x333333})
+);
+floor.rotation.x = -Math.PI/2;
+scene.add(floor);
+
+// DOOR
+const door = new THREE.Mesh(
+  new THREE.BoxGeometry(1.5,2.5,0.1),
+  new THREE.MeshBasicMaterial({color:0x8B4513})
+);
+door.position.set(0,1.25,-4.9);
+scene.add(door);
+
+// CAMERA START POSITION
+camera.position.set(0,1.6,2);
+
+// START GAME
+function startGame(selectedMode){
+  mode = selectedMode;
+
+  document.getElementById("menu").style.display="none";
+  document.getElementById("info").style.display="block";
+
+  if(mode === "mobile"){
+    document.getElementById("mobileControls").style.display="block";
+  }
+}
+
+// PC MOVEMENT
+document.addEventListener("keydown",(e)=>{
+  if(mode !== "pc") return;
+
+  if(e.key==="w") camera.position.z -= 0.2;
+  if(e.key==="s") camera.position.z += 0.2;
+  if(e.key==="a") camera.position.x -= 0.2;
+  if(e.key==="d") camera.position.x += 0.2;
+});
+
+// MOBILE MOVEMENT
+function move(dir){
+  if(mode !== "mobile") return;
+
+  if(dir==="w") camera.position.z -= 0.2;
+  if(dir==="s") camera.position.z += 0.2;
+  if(dir==="a") camera.position.x -= 0.2;
+  if(dir==="d") camera.position.x += 0.2;
+}
+
+// RENDER LOOP
+function animate(){
+  requestAnimationFrame(animate);
+  renderer.render(scene,camera);
+}
+animate();
+
+</script>
+
+</body>
+</html>
